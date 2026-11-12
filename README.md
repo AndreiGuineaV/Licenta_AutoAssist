@@ -1,4 +1,4 @@
-# AutoAssist — Portable Automobile Diagnosis System (`Licenta_Portable_Automobile_Diagnosis`)
+# AutoAssist — Portable Automobile Diagnostic System
 
 ![Android](https://img.shields.io/badge/Android-SDK%2031--36-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 ![Language](https://img.shields.io/badge/Language-Java%2011-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
@@ -6,7 +6,7 @@
 ![Gemini AI](https://img.shields.io/badge/Google%20Gemini-3.5%20Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
-**AutoAssist** is an intelligent, cloud-connected Android application developed as a Bachelor's Thesis project that empowers vehicle owners to diagnose automotive malfunctions through Retrieval-Augmented Generation (RAG) and multimodal Large Language Model (LLM) analysis. By combining a curated Firebase Firestore knowledge base of automotive components, dashboard warning lights, and vehicle-specific service history with Google's Gemini AI, the system delivers context-aware, bilingual (English/Romanian) troubleshooting and structured diagnostic reports.
+**AutoAssist** is an open-source, intelligent, cloud-connected Android automotive diagnostic assistant that empowers vehicle owners to diagnose automotive malfunctions through Retrieval-Augmented Generation (RAG) and multimodal Large Language Model (LLM) analysis. By combining a curated Firebase Firestore knowledge base of automotive components, dashboard warning lights, and vehicle-specific service history with Google's Gemini AI, the system delivers context-aware, bilingual (English/Romanian) troubleshooting and structured diagnostic reports.
 
 ---
 
@@ -262,6 +262,39 @@ Renders the structured JSON output from Gemini into Material cards displaying th
 
 ---
 
+## Roadmap & Planned Milestones
+
+The following features, refactors, and test suites are actively planned for upcoming release cycles:
+
+- [ ] **Milestone 1: Live OBD-II Bluetooth Integration (ELM327)** (~10 hours)
+  - Connect via Bluetooth SPP to standard ELM327 OBD-II adapters.
+  - Read standard Diagnostic Trouble Codes (DTCs) from the vehicle ECU in real time.
+  - Extract live sensor PIDs (RPM, Coolant Temp, MAF rate, Fuel Trim) and automatically inject them as primary telemetry into the Gemini diagnostic prompt.
+
+- [ ] **Milestone 2: Offline-First Architecture & Room Local Database** (~8 hours)
+  - Integrate Android Room ORM to cache vehicle specifications, service journals, warning lights, and car parts locally.
+  - Implement bidirectional synchronization with Cloud Firestore using Android WorkManager when internet connectivity is restored.
+  - Support offline symptom search and journal viewing.
+
+- [ ] **Milestone 3: PDF Diagnostic Report Generation & Sharing** (~5 hours)
+  - Render official diagnostic reports into formatted, shareable PDF documents including vehicle specs, severity badge, repair steps, and estimated costs in RON.
+  - Add native Android share sheet integration (`Intent.ACTION_SEND`) to export reports directly to mechanics via WhatsApp, Email, or printing.
+
+- [ ] **Milestone 4: Cloud Push Notifications via Firebase Cloud Messaging (FCM)** (~6 hours)
+  - Migrate local periodic WorkManager reminders to serverless Firebase Cloud Functions + FCM triggers.
+  - Deliver automated push notifications for expiring vehicle documentation (ITP, RCA, Rovinieta) and scheduled maintenance intervals.
+
+- [ ] **Milestone 5: Automated Testing Suite & CI/CD Pipeline** (~6 hours)
+  - Unit tests covering RAG prompt construction, JSON report schema validation, and date calculation utilities.
+  - Instrumentation tests with Robolectric and AndroidX Espresso covering chat message exchanges and car form validations.
+  - GitHub Actions CI workflow to automate Gradle builds, Lint checks, and unit test execution on pull requests.
+
+- [ ] **Milestone 6: Modern UI Migration (Jetpack Compose)** (~8 hours)
+  - Gradually migrate legacy XML ConstraintLayout screens (`AIDiagnosticActivity`, `DiagnosticReportActivity`, `MyGarageActivity`) to Jetpack Compose.
+  - Introduce Material You dynamic theming with persistent Dark Mode support.
+
+---
+
 ## Setup & Installation
 
 Follow these steps to configure and run the project locally in Android Studio:
@@ -289,10 +322,14 @@ cd Licenta_Portable_Automobile_Diagnosis
        └── google-services.json
    ```
 
-### 3. Configure the Gemini API Key (`local.properties`)
-The app reads `GEMINI_API_KEY` from `local.properties` at build time (`app/build.gradle.kts`) and exposes it via `BuildConfig.GEMINI_API_KEY`.
-1. Open (or create) the `local.properties` file in the root directory of the project.
-2. Add your Android SDK path and your Gemini API key:
+### 3. Configure API Keys & Environment (`local.properties`)
+The app reads `GEMINI_API_KEY` from `local.properties` at build time (`app/build.gradle.kts`) and exposes it via `BuildConfig.GEMINI_API_KEY`. The `local.properties` file is gitignored to protect your private credentials.
+
+1. Copy the provided template file:
+   ```bash
+   cp local.properties.example local.properties
+   ```
+2. Open `local.properties` and add your local Android SDK path and Gemini API key:
    ```properties
    sdk.dir=C\:\\Users\\<YourUsername>\\AppData\\Local\\Android\\Sdk
    GEMINI_API_KEY=your_actual_gemini_api_key_here
